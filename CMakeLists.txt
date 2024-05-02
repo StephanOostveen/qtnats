@@ -15,7 +15,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)  # to find qtnats_export.h
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+
+find_package(Qt6 COMPONENTS Core)
+if(NOT Qt6_FOUND)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core)
+    set(QT_VERSION_MAJOR 5)
+else()
+    set(QT_VERSION_MAJOR 6)
+endif()
+
 # according to https://gitlab.kitware.com/cmake/cmake/-/issues/20843 I need 2 find_package's to detect Qt5/Qt6
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Test Qml Quick REQUIRED)
 message("Using Qt version ${QT_VERSION}")
@@ -32,7 +40,7 @@ FetchContent_Declare(
 set(NATS_BUILD_WITH_TLS OFF)
 set(NATS_BUILD_EXAMPLES OFF)
 set(NATS_BUILD_STREAMING OFF)
-set(NATS_BUILD_LIB_SHARED OFF)
+set(NATS_BUILD_LIB_SHARED ON)
 
 set(BUILD_TESTING OFF)  # do not build cnats tests
 
@@ -44,7 +52,7 @@ include_directories(${cnats_SOURCE_DIR}/src src)
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "src/*.h")
 add_library(qtnats SHARED ${SOURCES} ${HEADERS})
-target_link_libraries(qtnats nats_static Qt::Core)
+target_link_libraries(qtnats nats Qt::Core)
 
 # this has no effect on Windows due to https://gitlab.kitware.com/cmake/cmake/-/issues/19618
 set_target_properties(qtnats PROPERTIES VERSION 0.1.0 SOVERSION 0.1)
