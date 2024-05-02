@@ -52,6 +52,7 @@ include_directories(${cnats_SOURCE_DIR}/src src)
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "src/*.h")
 add_library(qtnats SHARED ${SOURCES} ${HEADERS})
+target_include_directories(qtnats PUBLIC "src" ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(qtnats nats Qt::Core)
 
 # this has no effect on Windows due to https://gitlab.kitware.com/cmake/cmake/-/issues/19618
